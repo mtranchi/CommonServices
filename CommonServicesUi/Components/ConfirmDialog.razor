@@ -1,0 +1,44 @@
+﻿@if (showing)
+{
+    <div class="outer-relative">
+        <div class="d-flex flex-column justify-content-center align-items-center container container-white">
+
+            <div class="modal-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirm-title">@Title</h5>
+                        <button type="button" @onclick="Hide" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="confirm-message">
+                        <p>@Message</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" @onclick="ConfirmedCallback" class="btn btn-outline-success" aria-controls="form">Yes</button>
+                        <button type="button" @onclick="Hide" class="btn btn-outline-danger">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+@code{
+    [Parameter] public EventCallback ConfirmedCallback { get; set; }
+    [Parameter] public string Message { get; set; } = "Are you sure?";
+    [Parameter] public string Title { get; set; } = "Confirm delete";
+
+    bool showing;
+
+    public void Hide()
+    {
+        showing = false;
+    }
+
+    public void Show()
+    {
+        showing = true;
+    }
+}

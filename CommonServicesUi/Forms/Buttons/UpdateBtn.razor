@@ -1,0 +1,18 @@
+﻿@inherits BaseButton
+
+<button type="button" @onclick="Callback" title="@Title" class="btn btn-outline-info" @attributes="@AdditionalAttributes">
+    <i class="oi oi-data-transfer-upload"></i>
+</button>
+
+@code{
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(Title))
+        {
+            Title = "Update";
+        }
+
+        base.OnInitialized();
+    }
+}

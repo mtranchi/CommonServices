@@ -1,0 +1,140 @@
+﻿@using CommonServicesUi.Forms.Bases
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+@typeparam T
+@inherits CommonServicesUi.Forms.Bases.BaseSelectable<T>
+
+<div class="form-group mb-3" title="@(Required ? "Required" : "")">
+    <label for="@ElementId" class="@visuallyHiddedCss">
+        <b>
+            @DisplayName
+            @if (Required)
+            {
+                <span class="text-danger ms-1">*</span>
+            }
+        </b>
+    </label>
+
+    @if (needsInputGroup)
+    {
+        <div class="input-group">
+            @PrependHtml
+            @if (PrependText != null)
+            {
+                <span class="input-group-text">
+                    @PrependText
+                </span>
+            }
+
+            <input
+                @attributes="@AdditionalAttributes"
+                @bind="CurrentValue"
+                aria-labelledby="@ElementId"
+                autofocus="@Autofocus"
+                class="form-control @CssClass"
+                disabled="@Disabled"
+                id="@ElementId"
+                max="@Max"
+                min="@Min"
+                placeholder="@Placeholder"
+                required="@Required"
+                select-all="@SelectAll"
+                step="@Step"
+                type="number"
+                />
+
+            @if (AppendText != null)
+            {
+                <span class="input-group-text">
+                    @AppendText
+                </span>
+            }
+            @AppendHtml
+        </div>
+    }
+    else
+    {
+        <input
+            @attributes="@AdditionalAttributes"
+            @bind="CurrentValue"
+            aria-labelledby="@ElementId"
+            autofocus="@Autofocus"
+            class="form-control @CssClass"
+            disabled="@Disabled"
+            id="@ElementId"
+            max="@Max"
+            min="@Min"
+            placeholder="@Placeholder"
+            required="@Required"
+            select-all="@SelectAll"
+            step="@Step"
+            type="number"
+            />
+    }
+
+    @if (ValidationFor != null)
+    {
+        <div class="form-control-validation">
+            <ValidationMessage For="@ValidationFor" />
+        </div>
+    }
+    @if(HelpHtml != null)
+    {
+        <span class="form-text ms-3">
+            @HelpHtml
+        </span>
+    }
+    @if (HelpText != null)
+    {
+        <span class="form-text ms-3">@HelpText</span>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// Optional. Max value for the field. Default is decimal.MaxValue
+    /// </summary>
+    [Parameter] public double Max { get; set; } = double.MaxValue;
+
+    /// <summary>
+    /// Optional. Min value for the field. Default is decimal.MinValue
+    /// </summary>
+    [Parameter] public double Min { get; set; } = double.MinValue;
+
+    /// <summary>
+    /// Optional. How much to increment/decrement input value when using the buttons on the left of the input. Default is 1
+    /// </summary>
+    [Parameter] public decimal Step { get; set; } = 1;
+
+    #pragma warning disable CS8765
+    #pragma warning disable CS8625
+    protected override bool TryParseValueFromString(string value, out T result, out string validationErrorMessage)
+    {
+        if (typeof(T) == typeof(decimal))
+        {
+            decimal.TryParse(value, out var parsed);
+            result = (T)(object)parsed;
+            validationErrorMessage = null;
+            return true;
+        }
+        else if (typeof(T) == typeof(int))
+        {
+            int.TryParse(value, out var parsed);
+            result = (T)(object)parsed;
+            validationErrorMessage = null;
+            return true;
+        }
+        else if (typeof(T) == typeof(byte))
+        {
+            byte.TryParse(value, out var parsed);
+            result = (T)(object)parsed;
+            validationErrorMessage = null;
+            return true;
+        }
+
+        throw new InvalidOperationException($"{GetType()} does not support '{typeof(T)}'");
+    }
+    #pragma warning restore CS8765
+    #pragma warning restore CS8625
+}
+

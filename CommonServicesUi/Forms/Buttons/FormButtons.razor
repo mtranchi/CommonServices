@@ -1,0 +1,99 @@
+﻿@typeparam TId
+
+<div class="row">
+    <div class="col">
+        <input type="submit" value="@text" disabled="@Disabled" class="@cssClass" />
+    </div>
+    @if (showCancelButton)
+    {
+        <div class="col">
+            <button type="button" @onclick="CancelCallback" class="btn btn-outline-danger">Cancel</button>
+        </div>
+    }
+    @if (ShowResetButton)
+    {
+        <div class="col">
+            <input type="reset" value="Reset" class="btn btn-outline-warning" />
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// If this is set, a Cancel button will show
+    /// </summary>
+    [Parameter] public EventCallback CancelCallback { get; set; }
+
+    /// <summary>
+    /// Whether or not the button is disabled. Default is false
+    /// </summary>
+    [Parameter] public bool Disabled { get; set; }
+
+    /// <summary>
+    /// The Id of the Entity you're either creating or updating. Can be an int or a string. Sets the "submit" button to "Save" if int == 0 or string == nullOrWhitespace. Otherwise sets "submit" button to "Update"
+    /// </summary>
+    [Parameter] public TId? EntityId { get; set; }
+
+    /// <summary>
+    /// Keep in mind the reset button only resets the form to its original values. It does not clear the form
+    /// </summary>
+    [Parameter] public bool ShowResetButton { get; set; } = true;
+
+    string cssClass = "btn btn-outline-success";
+    bool showCancelButton;
+    string text = "Save";
+
+    /// <summary>
+    /// Disable the button
+    /// </summary>
+    public void Disable()
+    {
+        Disabled = true;
+    }
+
+    /// <summary>
+    /// Enable the button
+    /// </summary>
+    public void Enable()
+    {
+        Disabled = false;
+    }
+
+    protected override void OnInitialized()
+    {
+        if (EntityId == null) throw new ArgumentNullException("EntityId must be set");
+
+        bool creating = true;
+        if (typeof(TId) == typeof(int))
+        {
+            int.TryParse(EntityId.ToString(), out int result);
+            if (result != 0) creating = false;
+        }
+        else if (typeof(TId) == typeof(string))
+        {
+            if (string.IsNullOrWhiteSpace(EntityId.ToString())) creating = false;
+        }
+
+        if (!creating)
+        {
+            cssClass = "btn btn-outline-primary";
+            text = "Update";
+        }
+
+        if (CancelCallback.HasDelegate) showCancelButton = true;
+    }
+
+    public void UpdateSaveButton(bool saving)
+    {
+        if (saving)
+        {
+            cssClass = "btn btn-outline-success";
+            text = "Save";
+        }
+        else
+        {
+            cssClass = "btn btn-outline-info";
+            text = "Update";
+        }
+    }
+}

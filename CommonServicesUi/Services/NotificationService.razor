@@ -1,0 +1,123 @@
+﻿@using System.Timers
+
+@if(notices != null)
+{
+    <div class="alert-container @positionClass">
+        @foreach(var item in notices)
+        {
+            <div class="alert alert-@item.BootstrapCss" role="alert">
+                <i class="me-2 oi oi-@item.IconCss"></i>
+                @item.Message
+                <button @onclick="() => close(item)" class="ms-2 btn btn-sm btn-outline-@item.BootstrapCss">X</button>
+            </div>
+        }
+    </div>
+}
+
+
+@code{
+
+    /// <summary>
+    /// Optional. If true and the first Notification is BootstrapClass.Danger or BootstrapClass.Warning, the Notification will be centered on the screen. Default is true
+    /// </summary>
+    [Parameter] public bool AutoCenterDanger { get; set; } = true;
+
+    List<Notice> notices;
+    string positionClass = "bottom-left";
+    Timer timer;
+    bool userClosing = false;
+
+    /// <summary>
+    /// Displays a toast notification
+    /// </summary>
+    /// <param name="message">Message to display</param>
+    /// <param name="alertLevel">Optional. Bootstrap alert class to add add. Default is alert-info. Note that None and Link will be ignored</param>
+    /// <param name="position">Optional. Where to place alert on user's screen. Default is bottom left. Note that if AutoCenterDanger is true and alertLevel is Danger or Warning, the toast will be centered.</param>
+    /// <param name="seconds">Optional. How long (in seconds) to display the alert. Default is 6 seconds</param>
+    public void Notify(string message, BootstrapClass alertLevel = BootstrapClass.Info, NotificationPosition position = NotificationPosition.Bottom_Left, int seconds = 6)
+    {
+        Notice notice = new Notice(alertLevel, message, position, seconds);
+
+        if (notices == null)
+        {
+            if(AutoCenterDanger && (alertLevel == BootstrapClass.Danger || alertLevel == BootstrapClass.Warning))
+            {
+                setPosition(NotificationPosition.Center);
+            }
+            else if(position != NotificationPosition.Bottom_Left)
+            {
+                setPosition(position);
+            }
+
+            notices = new List<Notice>(1);
+        }
+
+        notices.Add(notice);
+
+        StateHasChanged();
+
+        if (timer == null)
+        {
+            timer = new Timer(1000);
+            timer.Elapsed += timerElapsed;
+            timer.Start();
+        }
+    }
+
+    void close(Notice notice)
+    {
+        userClosing = true;
+        notices.Remove(notice);
+        userClosing = false;
+    }
+
+    void killTimer()
+    {
+        timer.Stop();
+        timer.Elapsed -= timerElapsed;
+        timer = null;
+        notices = null;
+    }
+
+    void setPosition(NotificationPosition position)
+    {
+        switch (position)
+        {
+            case NotificationPosition.Top_Left:
+                positionClass = "top-left";
+                break;
+            case NotificationPosition.Top_Right:
+                positionClass = "top-right";
+                break;
+            case NotificationPosition.Bottom_Right:
+                positionClass = "bottom-right";
+                break;
+            case NotificationPosition.Center:
+                positionClass = "center";
+                break;
+
+        }
+    }
+
+    void timerElapsed(object source, ElapsedEventArgs e)
+    {
+        if (userClosing) return;
+
+        var now = DateTime.Now;
+        bool stateHasChanged = false;
+        for (int i = notices.Count - 1; i >= 0; i--)
+        {
+            if (userClosing) return;
+            var item = notices[i];
+            if (item.RemoveAt <= now)
+            {
+                notices.Remove(item);
+                stateHasChanged = true;
+            }
+        }
+
+        if (notices.Count < 1) killTimer();
+
+        if (stateHasChanged) StateHasChanged();
+    }
+}

@@ -1,0 +1,58 @@
+﻿@inherits BaseButton
+
+<button type="button" @onclick="buttonClicked" title="@Title" class="btn btn-outline-danger @btnSmallClass" @attributes="@AdditionalAttributes">
+    <i class="oi oi-trash"></i>
+</button>
+
+<ConfirmDialog ConfirmedCallback="confirmed" Message="@ConfirmMessage" Title="@ConfirmTitle" @ref="confirmDialog" />
+
+@code{
+    /// <summary>
+    /// The message to display to the user. Default is "Are you sure?"
+    /// </summary>
+    [Parameter] public string ConfirmMessage { get; set; } = "Are you sure?";
+
+    /// <summary>
+    /// The title of the confirm dialog. Default is "Confirm Delete"
+    /// </summary>
+    [Parameter] public string ConfirmTitle { get; set; } = "Confirm Delete";
+
+    /// <summary>
+    /// Whether or not to show a confirmation dialog. Default is true
+    /// </summary>
+    [Parameter] public bool ShowConfirmDialog { get; set; } = true;
+
+    #pragma warning disable CS8618
+    ConfirmDialog confirmDialog;
+    #pragma warning restore CS8618
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(Title))
+        {
+            Title = "Delete";
+        }
+
+        if (!BtnSmall) btnSmallClass = "";
+
+        base.OnInitialized();
+    }
+
+    async Task buttonClicked()
+    {
+        if (ShowConfirmDialog)
+        {
+            confirmDialog.Show();
+        }
+        else
+        {
+            await Callback.InvokeAsync();
+        }
+    }
+
+    async Task confirmed()
+    {
+        confirmDialog.Hide();
+        await Callback.InvokeAsync();
+    }
+}

@@ -1,0 +1,11 @@
+﻿@inherits BaseBootstrapButton
+
+<button type="button" @onclick="Callback" class="@bootstrapCss" title="@Title" @attributes="@AdditionalAttributes">
+    @ChildContent
+</button>
+
+@code{
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+}

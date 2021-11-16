@@ -1,0 +1,18 @@
+﻿@inherits BaseButton
+
+<button type="button" @onclick="Callback" disabled="@Disabled" title="@Title" class="btn btn-outline-info" @attributes="@AdditionalAttributes">
+    <i class="oi oi-pencil"></i>
+</button>
+
+@code{
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(Title))
+        {
+            Title = "Edit";
+        }
+
+        base.OnInitialized();
+    }
+}

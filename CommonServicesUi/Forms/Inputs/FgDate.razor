@@ -1,0 +1,119 @@
+﻿@inherits BaseSelectable<DateOnly>
+
+<div class="form-group mb-3" title="@(Required ? "Required" : "")">
+    <label for="@ElementId" class="@visuallyHiddedCss">
+        <b>
+            @DisplayName
+            @if (Required)
+            {
+                <span class="text-danger ms-1">*</span>
+            }
+        </b>
+    </label>
+
+    @if (needsInputGroup)
+    {
+        <div class="input-group">
+            @PrependHtml
+            @if (PrependText != null)
+            {
+                <span class="input-group-text">
+                    @PrependText
+                </span>
+            }
+
+            <input
+                @attributes="@AdditionalAttributes"
+                @bind="CurrentValue"
+                aria-labelledby="@ElementId"
+                autofocus="@Autofocus"
+                class="form-control @CssClass"
+                disabled="@Disabled"
+                id="@ElementId"
+                max="@maxStr"
+                min="@minStr"
+                placeholder="@Placeholder"
+                required="@Required"
+                select-all="@SelectAll"
+                type="date"
+                />
+
+            @if (AppendText != null)
+            {
+                <span class="input-group-text">
+                    @AppendText
+                </span>
+            }
+            @AppendHtml
+        </div>
+    }
+    else
+    {
+        <input
+            @attributes="@AdditionalAttributes"
+            @bind="CurrentValue"
+            aria-labelledby="@ElementId"
+            autofocus="@Autofocus"
+            class="form-control @CssClass"
+            disabled="@Disabled"
+            id="@ElementId"
+            max="@maxStr"
+            min="@minStr"
+            placeholder="@Placeholder"
+            required="@Required"
+            select-all="@SelectAll"
+            type="date"
+            />
+    }
+
+    @if (ValidationFor != null)
+    {
+        <div class="form-control-validation">
+            <ValidationMessage For="@ValidationFor" />
+        </div>
+    }
+    @if(HelpHtml != null)
+    {
+        <span class="form-text ms-3">
+            @HelpHtml
+        </span>
+    }
+    @if (HelpText != null)
+    {
+        <span class="form-text ms-3">@HelpText</span>
+    }
+</div>
+
+@code{
+    /// <summary>
+    /// Optional. Max value for the field. Default is decimal.MaxValue
+    /// </summary>
+    [Parameter] public DateTime? Max { get; set; }
+
+    /// <summary>
+    /// Optional. Min value for the field. Default is decimal.MinValue
+    /// </summary>
+    [Parameter] public DateTime? Min { get; set; }
+
+    string? maxStr;
+    string? minStr;
+
+    protected override void OnInitialized()
+    {
+        if (Max != null) maxStr = Max.Value.ToDateInputValue_Mt();
+        if (Min != null) minStr = Min.Value.ToDateInputValue_Mt();
+
+        base.OnInitialized();
+    }
+
+#pragma warning disable CS8765
+#pragma warning disable CS8625
+    protected override bool TryParseValueFromString(string value, out DateOnly result, out string validationErrorMessage)
+    {
+        DateOnly.TryParse(value, out result);
+        validationErrorMessage = null;
+        return true;
+    }
+    #pragma warning restore CS8765
+    #pragma warning restore CS8625
+}

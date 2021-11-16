@@ -1,0 +1,91 @@
+﻿@using CommonServicesUi.Forms.Bases
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+@inherits BaseText
+
+<div class="form-group mb-3" title="@(Required ? "Required" : "")">
+    <label for="@ElementId" class="@visuallyHiddedCss">
+        <b>
+            @DisplayName
+            @if (Required)
+            {
+                <span class="text-danger ms-1">*</span>
+            }
+        </b>
+        @if (MaxLength > 0)
+        {
+            <span class="@maxLengthCss ms-1">(@charactersRemaining)</span>
+        }
+    </label>
+
+    @if(needsInputGroup)
+    {
+        <div class="input-group">
+            @PrependHtml
+            @if(PrependText != null)
+            {
+                <span class="input-group-text">
+                    @PrependText
+                </span>
+            }
+
+            <input
+                @attributes="@AdditionalAttributes"
+                @bind="CurrentValue"
+                @oninput="e => displayCharactersRemaining(e.Value?.ToString())"
+                aria-labelledby="@ElementId"
+                autofocus="@Autofocus"
+                class="form-control @CssClass"
+                disabled="@Disabled"
+                id="@ElementId"
+                maxlength="@getMaxlengthAttributeValue()"
+                placeholder="@Placeholder"
+                required="@Required"
+                type="text"
+                />
+
+            @if(AppendText != null)
+            {
+                <span class="input-group-text">
+                    @AppendText
+                </span>
+            }
+            @AppendHtml
+        </div>
+    }
+    else
+    {
+        <input
+            @attributes="@AdditionalAttributes"
+            @bind="CurrentValue"
+            @oninput="e => displayCharactersRemaining(e.Value?.ToString())"
+            aria-labelledby="@ElementId"
+            autofocus="@Autofocus"
+            class="form-control @CssClass"
+            disabled="@Disabled"
+            id="@ElementId"
+            maxlength="@getMaxlengthAttributeValue()"
+            placeholder="@Placeholder"
+            required="@Required"
+            type="text"
+            />
+    }
+
+    @if (ValidationFor != null)
+    {
+        <div class="form-control-validation">
+            <ValidationMessage For="@ValidationFor" />
+        </div>
+    }
+    @if(HelpHtml != null)
+    {
+        <span class="form-text ms-3">
+            @HelpHtml
+        </span>
+    }
+    @if (HelpText != null)
+    {
+        <span class="form-text ms-3">@HelpText</span>
+    }
+</div>
+
