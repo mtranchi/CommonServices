@@ -1,0 +1,33 @@
+﻿<li class="nav-item dropdown">
+    <a @onclick="toggle" class="nav-link dropdown-toggle" role="button" aria-expanded="@ariaExpanded">@Heading</a>
+
+    @if (Expanded)
+    {
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Separated link</a></li>
+        </ul>
+    }
+</li>
+
+@code {
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    [Parameter] public bool Expanded { get; set; } = false;
+
+    [Parameter] public string Heading { get; set; }
+
+    string ariaExpanded => Expanded ? "true" : "false";
+
+    void toggle()
+    {
+        Expanded = !Expanded;
+        Heading = Expanded ? "Expanded" : "Closed";
+        StateHasChanged();
+    }
+}
+
